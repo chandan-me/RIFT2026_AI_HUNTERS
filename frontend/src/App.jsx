@@ -576,11 +576,102 @@ export default function App() {
     }
   };
 
-  const NAV_CONTENT = {
-    home:    { title:"Welcome to PharmaGuard", body:"An AI-powered pharmacogenomic risk prediction platform helping clinicians make safer, personalised medication decisions based on each patient's unique genetic profile." },
-    about:   { title:"About PharmaGuard", body:"Built for RIFT 2026 Hackathon, PharmaGuard integrates genomics, risk modelling, and explainable clinical recommendations to enable precision medicine at the point of care." },
-    contact: { title:"Contact", body:"📧 pharmaguard@rift2026.ai   📍 Bengaluru, India   🤖 Built by AI Hunters Team" },
-  };
+const NAV_CONTENT = {
+  home: {
+    title: "Welcome to PharmaGuard",
+    body: `
+      PharmaGuard is an AI-powered pharmacogenomic risk prediction platform designed
+      to improve medication safety and treatment outcomes. By analyzing a patient's
+      genetic profile, medical history, and medication data, PharmaGuard helps
+      healthcare professionals identify potential adverse drug reactions, optimize
+      drug selection, and deliver truly personalized healthcare solutions.
+
+      ✔ AI-Driven Risk Analysis
+      ✔ Personalized Medication Recommendations
+      ✔ Real-Time Clinical Decision Support
+      ✔ Explainable and Transparent Predictions
+    `
+  },
+
+  about: {
+    title: "About PharmaGuard",
+    body: `
+      PharmaGuard was developed by Team AI Hunters for the RIFT 2026 Hackathon
+      with the vision of transforming healthcare through precision medicine.
+
+      Traditional prescribing methods often overlook genetic variations that can
+      significantly affect how patients respond to medications. PharmaGuard bridges
+      this gap by combining Artificial Intelligence, Pharmacogenomics, and Clinical
+      Data Analytics to provide evidence-based medication insights.
+
+      Our platform empowers doctors, pharmacists, and healthcare institutions to:
+      
+      • Reduce adverse drug reactions (ADRs)
+      • Improve treatment effectiveness
+      • Support data-driven prescribing decisions
+      • Enhance patient safety and quality of care
+
+      PharmaGuard aims to make personalized medicine accessible, efficient,
+      and clinically actionable.
+    `
+  },
+
+  services: {
+    title: "Our Services",
+    body: `
+      PharmaGuard offers advanced healthcare intelligence services:
+
+      🧬 Genetic Risk Assessment
+      Analyze patient genetic profiles to identify medication risks.
+
+      💊 Drug Interaction Analysis
+      Detect harmful drug-gene and drug-drug interactions.
+
+      🤖 AI-Based Prediction Engine
+      Predict adverse drug reactions before they occur.
+
+      📊 Clinical Decision Support
+      Provide doctors with actionable treatment recommendations.
+
+      📄 Explainable AI Reports
+      Generate transparent and easy-to-understand clinical reports.
+
+      🔒 Secure Patient Data Management
+      Ensure privacy and compliance with healthcare standards.
+    `
+  },
+
+  features: {
+    title: "Key Features",
+    body: `
+      • Advanced Machine Learning Models
+      • Pharmacogenomic Risk Prediction
+      • Interactive Patient Dashboard
+      • Personalized Treatment Suggestions
+      • Real-Time Medication Safety Checks
+      • Explainable AI Insights
+      • Secure Cloud-Based Architecture
+      • Scalable for Hospitals and Clinics
+    `
+  },
+
+  contact: {
+    title: "Contact Us",
+    body: `
+      We'd love to hear from you.
+
+      📧 Email: pharmaguard@rift2026.ai
+      🌐 Website: www.pharmaguard.ai
+      📍 Location: Bengaluru, Karnataka, India
+      📞 Phone: +91 98765 43210
+
+      Team AI Hunters
+      RIFT 2026 Hackathon Project
+
+      Together, we are building the future of precision healthcare.
+    `
+  }
+};
 
   /* VCF status indicator */
   const vcfIcon = vcfStatus === "checking" ? "⏳"
