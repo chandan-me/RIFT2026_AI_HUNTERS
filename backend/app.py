@@ -11,9 +11,8 @@ from werkzeug.exceptions import HTTPException
 app = Flask(__name__)
 CORS(app, origins="*")
 
-# ──────────────────────────────────────────────
 # Config
-# ──────────────────────────────────────────────
+
 UPLOAD_FOLDER  = "uploads"
 MAX_FILE_BYTES = 5 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = MAX_FILE_BYTES
@@ -35,9 +34,8 @@ PHENO_SEVERITY = {
     "Normal":           1,
 }
 
-# ──────────────────────────────────────────────
 # Gene-drug interaction pairs
-# ──────────────────────────────────────────────
+
 GENE_DRUG_INTERACTIONS = [
     (
         "CYP2D6", "CODEINE", "TRAMADOL",
@@ -60,9 +58,8 @@ GENE_DRUG_INTERACTIONS = [
     ),
 ]
 
-# ──────────────────────────────────────────────
 # Allele → Phenotype map
-# ──────────────────────────────────────────────
+
 ALLELE_PHENOTYPE_MAP = {
     "CYP2D6": {
         "*1": "Normal", "*2": "Normal", "*35": "Normal",
@@ -76,9 +73,9 @@ ALLELE_PHENOTYPE_MAP = {
     "*2":  "Poor_Metabolizer",
     "*3":  "Poor_Metabolizer",
     "*17": "Ultrarapid",
-    "*4":  "Poor_Metabolizer",   # add this
-    "*6":  "Poor_Metabolizer",   # add this
-    "*9":  "Intermediate",       # add this — *9 is intermediate, not normal
+    "*4":  "Poor_Metabolizer",   
+    "*6":  "Poor_Metabolizer",   
+    "*9":  "Intermediate",       
     },
     "CYP2C9": {
         "*1": "Normal",
@@ -140,9 +137,8 @@ def check_interactions(drug_list: list) -> list:
     return warnings
 
 
-# ──────────────────────────────────────────────
 # VCF Parser
-# ──────────────────────────────────────────────
+
 def parse_vcf(filepath: str) -> list:
     variants = []
     try:
@@ -208,9 +204,8 @@ def parse_vcf(filepath: str) -> list:
     return variants
 
 
-# ──────────────────────────────────────────────
 # VCF Validator
-# ──────────────────────────────────────────────
+
 def validate_vcf_content(filepath: str) -> dict:
     errors   = []
     warnings = []
@@ -268,9 +263,8 @@ def validate_vcf_content(filepath: str) -> dict:
     }
 
 
-# ──────────────────────────────────────────────
 # Response builder
-# ──────────────────────────────────────────────
+
 def build_response(drug: str, all_variants: list, patient_id: str) -> dict:
     relevant_genes = DRUG_GENE_MAP.get(drug, [])
     v_subset       = [v for v in all_variants if v["gene"] in relevant_genes]
@@ -346,9 +340,8 @@ def build_response(drug: str, all_variants: list, patient_id: str) -> dict:
     }
 
 
-# ──────────────────────────────────────────────
 # Routes
-# ──────────────────────────────────────────────
+
 @app.route("/")
 def home():
     return {"status": "PharmaGuard Backend is Running", "version": "3.0"}, 200
@@ -423,10 +416,10 @@ def analyze():
             "supported_drugs": sorted(DRUG_GENE_MAP.keys()),
         }), 400
 
-    # Accept patient ID from form — fallback to generic ID
+    # this will Accept patient ID from form — fallback to generic ID
     patient_id = request.form.get("patient_id", "").strip() or "PATIENT_001"
 
-    # UUID filename — no path traversal possible
+    # by this code off lines UUID filename — no path traversal possible
     filepath = os.path.join(UPLOAD_FOLDER, f"{uuid.uuid4().hex}.vcf")
     file.save(filepath)
 
@@ -466,9 +459,8 @@ def analyze():
     }), 200
 
 
-# ──────────────────────────────────────────────
 # Error handlers
-# ──────────────────────────────────────────────
+
 @app.errorhandler(HTTPException)
 def handle_http_error(e):
     return jsonify({"error": e.name, "details": e.description}), e.code
