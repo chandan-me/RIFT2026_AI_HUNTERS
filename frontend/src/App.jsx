@@ -1,8 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 
-/* ─────────────────────────────────────────────
-   CONSTANTS
-───────────────────────────────────────────── */
+/*  CONSTANTS */
 const API = "https://rift2026-ai-hunters-ss4e.onrender.com/";
 
 const SUPPORTED_DRUGS = [
@@ -19,9 +17,7 @@ const RISK_META = {
 const getRisk = (label) =>
   RISK_META[label] || { color:"#6b7280", bg:"#f3f4f6", border:"#d1d5db", icon:"?" };
 
-/* ─────────────────────────────────────────────
-   PDF REPORT GENERATOR  (#1)
-───────────────────────────────────────────── */
+/*  PDF REPORT GENERATOR */
 function generatePDF(results, summary, patientId) {
   const now    = new Date().toLocaleString();
   const riskColor = { Safe:"#10b981", "Adjust Dosage":"#f59e0b", Toxic:"#ef4444", Ineffective:"#8b5cf6" };
@@ -114,9 +110,7 @@ function generatePDF(results, summary, patientId) {
   win.print();
 }
 
-/* ─────────────────────────────────────────────
-   FORMAT TIMESTAMP  (#8)
-───────────────────────────────────────────── */
+/*  FORMAT TIMESTAMP   */
 function formatTimestamp(iso) {
   if (!iso) return "";
   try {
@@ -127,9 +121,7 @@ function formatTimestamp(iso) {
   } catch { return iso; }
 }
 
-/* ─────────────────────────────────────────────
-   RISK SUMMARY DASHBOARD  (#3)
-───────────────────────────────────────────── */
+/*  RISK SUMMARY DASHBOARD  */
 function RiskSummaryDashboard({ summary, darkMode }) {
   const cardBg = darkMode ? "#1e2530" : "#ffffff";
   const border = darkMode ? "#2e3a4e" : "#e2e8f0";
@@ -201,9 +193,7 @@ function RiskSummaryDashboard({ summary, darkMode }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   INTERACTION WARNING BANNER  (#4)
-───────────────────────────────────────────── */
+/*  INTERACTION WARNING BANNER   */
 function InteractionBanner({ warnings, darkMode }) {
   const [open, setOpen] = useState(true);
   if (!warnings?.length || !open) return null;
@@ -234,9 +224,7 @@ function InteractionBanner({ warnings, darkMode }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   RESULT CARD  (#10 #11 #12)
-───────────────────────────────────────────── */
+/*  RESULT CARD   */
 function ResultCard({ data, darkMode, index }) {
   const [expanded,  setExpanded]  = useState(false);
   const [copied,    setCopied]    = useState(false);
@@ -271,7 +259,7 @@ function ResultCard({ data, darkMode, index }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // #11 — copy just the recommendation text
+  //  copying just the recommendation text
   const copyRec = () => {
     navigator.clipboard.writeText(rec.recommendation_text || "");
     setCopiedRec(true);
@@ -279,7 +267,7 @@ function ResultCard({ data, darkMode, index }) {
   };
 
   return (
-    // #12 — staggered entrance animation
+    // staggered entrance animation
     <div style={{
       background: cardBg, border: `1px solid ${border}`,
       borderRadius: "20px", padding: "28px",
@@ -288,7 +276,7 @@ function ResultCard({ data, darkMode, index }) {
       animation: `fadeSlideIn 0.4s ease ${index * 0.08}s both`,
     }}>
 
-      {/* #10 — zero-variant state */}
+      {/* zero-variant state */}
       {noVariants && (
         <div style={{
           background: darkMode?"#1a2535":"#f0f9ff",
@@ -309,6 +297,7 @@ function ResultCard({ data, darkMode, index }) {
           {/* #8 — human-readable timestamp */}
           <p style={{ margin:"2px 0 0", fontSize:"11px", color:textMuted }}>{formatTimestamp(data.timestamp)}</p>
         </div>
+         
         {/* #12 — animated risk badge */}
         <div style={{
           display:"flex", alignItems:"center", gap:"8px",
@@ -460,9 +449,7 @@ function ResultCard({ data, darkMode, index }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   SKELETON
-───────────────────────────────────────────── */
+/*  SKELETON */
 function Skeleton({ darkMode }) {
   const sh = darkMode ? "#2e3a4e" : "#e2e8f0";
   const bg = darkMode ? "#1e2530" : "#ffffff";
@@ -479,13 +466,11 @@ function Skeleton({ darkMode }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   MAIN APP
-───────────────────────────────────────────── */
+/*  MAIN APP */
 export default function App() {
   const [file,        setFile]        = useState(null);
   const [drug,        setDrug]        = useState("");
-  const [patientId,   setPatientId]   = useState("");           // #2
+  const [patientId,   setPatientId]   = useState("");           
   const [dragActive,  setDragActive]  = useState(false);
   const [loading,     setLoading]     = useState(false);
   const [results,     setResults]     = useState(null);
@@ -494,10 +479,10 @@ export default function App() {
   const [error,       setError]       = useState(null);
   const [darkMode,    setDarkMode]    = useState(false);
   const [activeNav,   setActiveNav]   = useState(null);
-  const [vcfStatus,   setVcfStatus]   = useState(null);         // #5: null|"checking"|"ok"|"error"
+  const [vcfStatus,   setVcfStatus]   = useState(null);        
   const fileInputRef  = useRef();
 
-  /* ── theme ── */
+  /* dark theme */
   const bg        = darkMode ? "linear-gradient(135deg,#0d1117,#161d27,#1a2433)" : "linear-gradient(135deg,#f0f4f8,#e8eef4,#dde5ef)";
   const navBg     = darkMode ? "#0d1117" : "#ffffff";
   const textMain  = darkMode ? "#f1f5f9" : "#0f172a";
@@ -507,7 +492,7 @@ export default function App() {
   const cardBg    = darkMode ? "#1e2530" : "#ffffff";
   const cardBdr   = darkMode ? "#2e3a4e" : "#e2e8f0";
 
-  /* ── VCF validation on file pick  (#5) ── */
+  /* VCF validation on file pick  */
   const validateFile = useCallback(async (f) => {
     setVcfStatus("checking");
     const fd = new FormData();
@@ -530,7 +515,7 @@ export default function App() {
         setError(null);
       }
     } catch {
-      setVcfStatus("ok"); // don't block if validate endpoint unreachable
+      setVcfStatus("ok"); 
     }
   }, []);
 
@@ -552,7 +537,7 @@ export default function App() {
     handleFilePick(e.dataTransfer.files?.[0]);
   };
 
-  /* ── Drug chip toggle ── */
+  /* Drug chip toggle */
   const toggleDrug = (d) => {
     const existing = drug.split(",").map(x=>x.trim()).filter(Boolean);
     if (existing.includes(d)) {
@@ -562,7 +547,7 @@ export default function App() {
     }
   };
 
-  /* ── Analyse ── */
+  /* Analyse  */
   const handleAnalyze = async () => {
     if (!file)        return setError("Please upload a VCF file.");
     if (!drug.trim()) return setError("Please enter a drug name.");
@@ -597,7 +582,7 @@ export default function App() {
     contact: { title:"Contact", body:"📧 pharmaguard@rift2026.ai   📍 Bengaluru, India   🤖 Built by AI Hunters Team" },
   };
 
-  /* ── VCF status indicator ── */
+  /* VCF status indicator */
   const vcfIcon = vcfStatus === "checking" ? "⏳"
                 : vcfStatus === "ok"       ? "✅"
                 : vcfStatus === "error"    ? "❌"
@@ -606,7 +591,7 @@ export default function App() {
   return (
     <div style={{ fontFamily:"'DM Sans','Segoe UI',sans-serif", minHeight:"100vh", background:bg, color:textMain, transition:"all 0.4s ease", overflowX:"hidden" }}>
 
-      {/* ════ NAVBAR ════ */}
+      {/*  NAVBAR  */}
       <nav style={{
         position:"sticky", top:0, zIndex:100,
         background:navBg, borderBottom:`1px solid ${cardBdr}`,
@@ -652,7 +637,7 @@ export default function App() {
         )}
       </div>
 
-      {/* ════ HERO ════ */}
+      {/* HERO section */}
       <div style={{ textAlign:"center", padding:"64px 20px 40px", position:"relative" }}>
         <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"600px", height:"300px", background:darkMode?"radial-gradient(ellipse,rgba(59,130,246,0.15) 0%,transparent 70%)":"radial-gradient(ellipse,rgba(59,130,246,0.10) 0%,transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ display:"inline-flex", alignItems:"center", gap:"8px", background:darkMode?"#1e2530":"#eff6ff", border:`1px solid ${darkMode?"#2e3a4e":"#bfdbfe"}`, borderRadius:"99px", padding:"6px 16px", marginBottom:"20px" }}>
@@ -665,11 +650,11 @@ export default function App() {
         </p>
       </div>
 
-      {/* ════ MAIN CARD ════ */}
+      {/* MAIN CARD section*/}
       <div style={{ display:"flex", justifyContent:"center", padding:"0 20px 60px" }}>
         <div style={{ width:"100%", maxWidth:"660px", background:cardBg, border:`1px solid ${cardBdr}`, borderRadius:"24px", padding:"36px", boxShadow:darkMode?"0 8px 40px rgba(0,0,0,0.5)":"0 8px 40px rgba(0,0,0,0.10)" }}>
 
-          {/* Patient ID  (#2) */}
+          {/* Patient ID  */}
           <p style={{ margin:"0 0 8px", fontSize:"11px", fontWeight:700, color:textMuted, textTransform:"uppercase", letterSpacing:"0.08em" }}>Patient ID</p>
           <input type="text" placeholder="e.g. PAT-2024-001 (optional)"
             value={patientId} onChange={e=>setPatientId(e.target.value)}
@@ -678,7 +663,7 @@ export default function App() {
             onBlur={e=>e.target.style.borderColor=inputBdr}
           />
 
-          {/* Upload  (#5 — live vcf status) */}
+          {/* Upload  (live vcf status) */}
           <p style={{ margin:"0 0 8px", fontSize:"11px", fontWeight:700, color:textMuted, textTransform:"uppercase", letterSpacing:"0.08em" }}>Genetic File</p>
           <label onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
             style={{
@@ -704,7 +689,7 @@ export default function App() {
             <input ref={fileInputRef} type="file" accept=".vcf" onChange={e=>handleFilePick(e.target.files[0])} style={{ display:"none" }}/>
           </label>
 
-          {/* Drug dropdown  (#6) */}
+          {/* Drug dropdown  */}
           <p style={{ margin:"0 0 8px", fontSize:"11px", fontWeight:700, color:textMuted, textTransform:"uppercase", letterSpacing:"0.08em" }}>Drug Name</p>
           <select value="" onChange={e=>{ if(e.target.value) toggleDrug(e.target.value); }}
             style={{ width:"100%", padding:"11px 14px", borderRadius:"10px", border:`1.5px solid ${inputBdr}`, background:inputBg, color:drug?textMain:textMuted, fontSize:"14px", outline:"none", boxSizing:"border-box", marginBottom:"10px", fontFamily:"inherit", cursor:"pointer", transition:"border-color 0.2s" }}
@@ -764,15 +749,15 @@ export default function App() {
           {results && !loading && (
             <div style={{ marginTop:"28px" }}>
 
-              {/* Summary dashboard  (#3) */}
+              {/* Summary dashboard  */}
               {summary && results.length > 1 && (
                 <RiskSummaryDashboard summary={summary} darkMode={darkMode}/>
               )}
 
-              {/* Interaction warnings  (#4) */}
+              {/* Interaction warnings */}
               <InteractionBanner warnings={warnings} darkMode={darkMode}/>
 
-              {/* PDF report button  (#1) */}
+              {/* PDF report button */}
               {summary && (
                 <button onClick={()=>generatePDF(results, summary, patientId||"PATIENT_001")} style={{
                   width:"100%", padding:"12px", borderRadius:"12px", border:`1px solid ${cardBdr}`,
@@ -796,7 +781,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* ════ FEATURES ════ */}
+      {/* FEATURES  */}
       <div style={{ background:darkMode?"#111827":"#ffffff", padding:"72px 20px", textAlign:"center" }}>
         <p style={{ margin:"0 0 8px", fontSize:"11px", fontWeight:700, color:"#3b82f6", letterSpacing:"0.1em", textTransform:"uppercase" }}>Why Choose Us</p>
         <h2 style={{ fontSize:"clamp(28px,4vw,40px)", fontWeight:800, letterSpacing:"-0.02em", margin:"0 0 48px" }}>Why Pharma Guard?</h2>
@@ -824,7 +809,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* ════ FOOTER ════ */}
+      {/* FOOTER */}
       <div style={{ background:darkMode?"#0d1117":"#f8fafc", borderTop:`1px solid ${cardBdr}`, padding:"20px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:"12px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
           <span style={{ fontSize:"18px" }}>🧬</span>
