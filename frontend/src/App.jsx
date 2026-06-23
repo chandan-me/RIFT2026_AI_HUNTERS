@@ -1,5 +1,4 @@
-import { useState, useRef, useCallback } from "react";
-
+import React, { useState, useEffect, useRef, useCallback } from "react";
 /*  CONSTANTS */
 const API = "https://rift2026-ai-hunters-ss4e.onrender.com/";
 
@@ -294,11 +293,11 @@ function ResultCard({ data, darkMode, index }) {
         <div>
           <p style={{ margin:0, fontSize:"11px", fontWeight:700, color:textMuted, textTransform:"uppercase", letterSpacing:"0.1em" }}>Drug</p>
           <h3 style={{ margin:"2px 0 0", fontSize:"22px", fontWeight:800, color:textMain, letterSpacing:"-0.02em" }}>{data.drug}</h3>
-          {/* #8 — human-readable timestamp */}
+          {/*  human-readable timestamp */}
           <p style={{ margin:"2px 0 0", fontSize:"11px", color:textMuted }}>{formatTimestamp(data.timestamp)}</p>
         </div>
          
-        {/* #12 — animated risk badge */}
+        {/* animated risk badge */}
         <div style={{
           display:"flex", alignItems:"center", gap:"8px",
           background: risk.bg, border:`1.5px solid ${risk.border}`,
@@ -473,14 +472,68 @@ export default function App() {
   const [patientId,   setPatientId]   = useState("");           
   const [dragActive,  setDragActive]  = useState(false);
   const [loading,     setLoading]     = useState(false);
+
+      // page loader states
+       const [loader,     setLoader]     = useState(true);  
+          const [progress, setProgress] = useState(0);
+            const [statusIndex, setStatusIndex] = useState(0);
+
   const [results,     setResults]     = useState(null);
   const [summary,     setSummary]     = useState(null);
   const [warnings,    setWarnings]    = useState([]);
   const [error,       setError]       = useState(null);
   const [darkMode,    setDarkMode]    = useState(false);
   const [activeNav,   setActiveNav]   = useState(null);
-  const [vcfStatus,   setVcfStatus]   = useState(null);        
+  const [vcfStatus,   setVcfStatus]   = useState(null);      
+
+      // for mobile menu toggle
+      const [menuOpen, setMenuOpen] = useState(false);
+  
+        const CONTAINER = {
+        width: "100%",
+        maxWidth: "1400px",
+        margin: "0 auto",
+        padding: "0 20px"
+        };
+    
+        const navContentRef = useRef(null);
   const fileInputRef  = useRef();
+
+//  page loader use effect
+const statusMessages = [
+  "Loading Genomic Data...",
+  "Running AI Analysis...",
+  "Checking Drug Interactions...",
+  "Generating Clinical Report..."
+];
+
+useEffect(() => {
+
+  let current = 0;
+
+  const progressTimer = setInterval(() => {
+
+    current += Math.floor(Math.random() * 10) + 5; // Increment by a random value between 5 and 15
+
+    setProgress(current);
+
+    if (current >= 100) {
+      clearInterval(progressTimer);
+      setLoader(false);
+    }
+
+  }, 1000);
+
+  const statusTimer = setInterval(() => {
+    setStatusIndex(prev => (prev + 1) % statusMessages.length);
+  }, 1200);
+
+  return () => {
+    clearInterval(progressTimer);
+    clearInterval(statusTimer);
+  };
+
+}, []);
 
   /* dark theme */
   const bg        = darkMode ? "linear-gradient(135deg,#0d1117,#161d27,#1a2433)" : "linear-gradient(135deg,#f0f4f8,#e8eef4,#dde5ef)";
@@ -577,99 +630,57 @@ export default function App() {
   };
 
 const NAV_CONTENT = {
-  home: {
-    title: "Welcome to PharmaGuard",
-    body: `
-      PharmaGuard is an AI-powered pharmacogenomic risk prediction platform designed
-      to improve medication safety and treatment outcomes. By analyzing a patient's
-      genetic profile, medical history, and medication data, PharmaGuard helps
-      healthcare professionals identify potential adverse drug reactions, optimize
-      drug selection, and deliver truly personalized healthcare solutions.
+    home: {
+      icon: "🏠",
+      title: "Welcome to PharmaGuard",
+      subtitle: "AI-Powered Precision Medicine Platform",
 
-      ✔ AI-Driven Risk Analysis
-      ✔ Personalized Medication Recommendations
-      ✔ Real-Time Clinical Decision Support
-      ✔ Explainable and Transparent Predictions
-    `
+      description: `
+    Transforming healthcare through pharmacogenomics, machine learning, and personalized medication intelligence.
+
+    PharmaGuard is an AI-powered pharmacogenomic risk prediction platform designed to analyze patient genetic data and predict personalized drug response risks.
+
+    The system helps identify adverse drug reactions, optimize dosage recommendations, and provide explainable clinical insights using AI and genomic data.
+
+    Developed as part of the RIFT 2026 HealthTech AI Hackathon, PharmaGuard aims to advance precision medicine through intelligent genomic analysis.
+      `,
+
+      stats: [
+        { value: "95%", label: "Prediction Accuracy" },
+        { value: "24/7", label: "Clinical Support" },
+        { value: "AI", label: "Risk Assessment" }
+      ]
+
   },
 
   about: {
+    icon: "🧬",
     title: "About PharmaGuard",
-    body: `
-      PharmaGuard was developed by Team AI Hunters for the RIFT 2026 Hackathon
-      with the vision of transforming healthcare through precision medicine.
+    description:"PharmaGuard is an enterprise AI platform that integrates genomic analysis and clinical insights to eliminate adverse drug reactions. The system provides real-time decision support, allowing hospital networks to predict patient drug responses and optimize treatment efficacy. By automating precision medicine workflows, it significantly reduces care delivery costs while maximizing patient safety and treatment outcomes. PharmaGuard is designed to be scalable, secure, and compliant with healthcare regulations, making it suitable for deployment in hospitals, clinics, and research institutions.",
 
-      Traditional prescribing methods often overlook genetic variations that can
-      significantly affect how patients respond to medications. PharmaGuard bridges
-      this gap by combining Artificial Intelligence, Pharmacogenomics, and Clinical
-      Data Analytics to provide evidence-based medication insights.
+    features: [
+      "Pharmacogenomic Analysis",
+      "AI Risk Prediction",
+      "Clinical Decision Support",
+      "Personalized Treatment Plans"
+    ],
 
-      Our platform empowers doctors, pharmacists, and healthcare institutions to:
-      
-      • Reduce adverse drug reactions (ADRs)
-      • Improve treatment effectiveness
-      • Support data-driven prescribing decisions
-      • Enhance patient safety and quality of care
-
-      PharmaGuard aims to make personalized medicine accessible, efficient,
-      and clinically actionable.
-    `
+    stats: [
+  { value: "95%", label: "Prediction Accuracy" },
+  { value: "50K+", label: "Genomic Variants" },
+  { value: "24/7", label: "Clinical Support" },
+],
   },
 
-  services: {
-    title: "Our Services",
-    body: `
-      PharmaGuard offers advanced healthcare intelligence services:
-
-      🧬 Genetic Risk Assessment
-      Analyze patient genetic profiles to identify medication risks.
-
-      💊 Drug Interaction Analysis
-      Detect harmful drug-gene and drug-drug interactions.
-
-      🤖 AI-Based Prediction Engine
-      Predict adverse drug reactions before they occur.
-
-      📊 Clinical Decision Support
-      Provide doctors with actionable treatment recommendations.
-
-      📄 Explainable AI Reports
-      Generate transparent and easy-to-understand clinical reports.
-
-      🔒 Secure Patient Data Management
-      Ensure privacy and compliance with healthcare standards.
-    `
-  },
-
-  features: {
-    title: "Key Features",
-    body: `
-      • Advanced Machine Learning Models
-      • Pharmacogenomic Risk Prediction
-      • Interactive Patient Dashboard
-      • Personalized Treatment Suggestions
-      • Real-Time Medication Safety Checks
-      • Explainable AI Insights
-      • Secure Cloud-Based Architecture
-      • Scalable for Hospitals and Clinics
-    `
-  },
-
-  contact: {
-    title: "Contact Us",
-    body: `
-      We'd love to hear from you.
-
-      📧 Email: pharmaguard@rift2026.ai
-      📍 Location: Bengaluru, Karnataka, India
-      📞 Phone: +91 6360475219
-
-      Team AI Hunters
-      RIFT 2026 Hackathon Project
-
-      Together, we are building the future of precision healthcare.
-    `
-  }
+contact: {
+  icon: "📞",
+  title: "Get In Touch",
+  subtitle: "AI Hunters Team",
+  email: "pharmaguard.ai@gmail.com",
+  phone: "+91 6360475219",
+  location: "Bengaluru, Karnataka",
+  website: "www.pharmaguard.ai"
+}
 };
 
   /* VCF status indicator */
@@ -678,32 +689,133 @@ const NAV_CONTENT = {
                 : vcfStatus === "error"    ? "❌"
                 : "📁";
 
+
+  // page Loader animation
+
+
+if (loader) {
+  return (
+    <div className="loader-screen">
+
+      <div className="loader-card">
+
+        <div className="dna-glow"></div>
+
+        <div className="dna-loader">
+          🧬
+        </div>
+
+        <h1 className="loader-title">
+          Pharma Guard
+        </h1>
+
+        <p className="loader-tagline">
+          Precision Pharmacogenomics Platform
+        </p>
+
+        <div className="status-text">
+          {statusMessages[statusIndex]}
+        </div>
+
+        <div className="loader-bar">
+          <div
+            className="loader-progress"
+            style={{
+              width: `${progress}%`
+            }}
+          />
+        </div>
+
+        <div className="progress-text">
+          {progress}%
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
   return (
     <div style={{ fontFamily:"'DM Sans','Segoe UI',sans-serif", minHeight:"100vh", background:bg, color:textMain, transition:"all 0.4s ease", overflowX:"hidden" }}>
 
       {/*  NAVBAR  */}
-      <nav style={{
-        position:"sticky", top:0, zIndex:100,
-        background:navBg, borderBottom:`1px solid ${cardBdr}`,
-        padding:"0 32px", height:"64px",
-        display:"flex", alignItems:"center", justifyContent:"space-between",
-        boxShadow: darkMode?"0 1px 0 #2e3a4e":"0 1px 0 #e2e8f0",
-      }}>
-        <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+        <nav
+  className="navbar-container"
+  style={{
+        position:"fixed",
+        top:0,
+        left: 0,
+        right: 0,
+        zIndex:1000,
+        background: darkMode
+        ? "rgba(15,23,42,0.85)"
+        : "rgba(255,255,255,0.75)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        boxShadow: "0 8px 32px rgba(0,0,0,.08)",
+        backdropFilter:"blur(12px)",
+        borderBottom:`2px solid ${cardBdr}`,
+        padding:"12px 20px",
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"space-between",
+        flexWrap:"wrap",
+        gap:"15px"
+        }}
+    >
+
+        <div 
+         className="logo-section"
+         style={{ display:"flex", alignItems:"center", gap:"10px" }}>
           <span style={{ fontSize:"26px" }}>🧬</span>
-          <span style={{ fontSize:"17px", fontWeight:700, letterSpacing:"-0.02em" }}>Pharma Guard</span>
+          <span style={{ fontSize:"18px", fontWeight:700, letterSpacing:"-0.02em",    whiteSpace:"nowrap", }}>Pharma Guard</span>
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
+
+          {/* Mobile Hamburger */}
+        <div className="mobile-menu-btn">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              background:"transparent",
+              border:"none",
+              fontSize:"28px",
+              color:textMain,
+              cursor:"pointer"
+            }}
+          >
+            ☰
+          </button>
+        </div>
+
+        {/* Desktop Menu */}
+        <div className="desktop-menu">
+          <div
+          className="nav-menu"
+          style={{ display:"flex", alignItems:"center", gap:"16px" }}
+          >
           {["home","about","contact"].map(item=>(
-            <button key={item} onClick={()=>setActiveNav(activeNav===item?null:item)} style={{
+            <button key={item} 
+              onClick={() => {
+                setActiveNav(item);
+                setTimeout(() => {
+                  navContentRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                  });
+                }, 100);
+
+              }}
+            style={{
               padding:"7px 14px", borderRadius:"8px", border:"none",
-              background:activeNav===item?(darkMode?"#2e3a4e":"#f1f5f9"):"transparent",
+              background:activeNav===item?(darkMode?"#2e3a4e":"#7e95ac"):"transparent",
               color:textMuted, fontSize:"14px", fontWeight:500,
               cursor:"pointer", textTransform:"capitalize", transition:"all 0.2s",
+              fontWeight:activeNav===item?700:500, color:activeNav===item?textMain:textMuted,
             }}>{item}</button>
           ))}
           <div style={{ width:"1px", height:"24px", background:cardBdr, margin:"0 6px" }}/>
-          <button onClick={()=>window.open("https://drive.google.com/file/d/1605SsCNf5HbA3b-QvoE650QvXEtTDz2b/view?usp=sharing","_blank")} style={{
+          <button onClick={()=>window.open("https://drive.google.com/file/d/1605SsCNf5HbA3b-QvoE650QvXEtTDz2b/view?usp=sharing","_blank","noopener,noreferrer")} style={{
             padding:"8px 14px", borderRadius:"99px", border:"none",
             background:"linear-gradient(135deg,#3b82f6,#1d4ed8)", color:"#fff",
             fontSize:"13px", fontWeight:600, cursor:"pointer",
@@ -712,22 +824,301 @@ const NAV_CONTENT = {
             padding:"8px 14px", borderRadius:"99px", border:`1px solid ${cardBdr}`,
             background:darkMode?"#f1f5f9":"#1e293b",
             color:darkMode?"#1e293b":"#f1f5f9",
-            fontSize:"13px", fontWeight:600, cursor:"pointer", marginLeft:"4px",
-          }}>{darkMode?"☀ Light":"🌙 Dark"}</button>
+            fontSize:"15px", fontWeight:600, cursor:"pointer", marginLeft:"10px",
+          }}>{darkMode?" ☀️ ":"🌙 "}</button>
         </div>
+        </div>
+        
       </nav>
+    
+   {menuOpen && (
+  <div
+    className="mobile-dropdown"
+    style={{
+      background: cardBg,
+      padding: "15px",
+      borderBottom: `1px solid ${cardBdr}`,
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px"
+    }}
+  >
+    <button
+      onClick={()=>{
+        setActiveNav("home");
+        setMenuOpen(false);
+      }}
+    >
+      🏠 Home
+    </button>
+
+    <button
+      onClick={()=>{
+        setActiveNav("about");
+        setMenuOpen(false);
+      }}
+    >
+      🧬 About
+    </button>
+
+    <button
+      onClick={()=>{
+        setActiveNav("contact");
+        setMenuOpen(false);
+      }}
+    >
+      📞 Contact
+    </button>
+
+    <button
+      onClick={() =>
+        window.open(
+          "https://drive.google.com/file/d/1605SsCNf5HbA3b-QvoE650QvXEtTDz2b/view?usp=sharing",
+          "_blank"
+        )
+      }
+    >
+      📥 Dataset
+    </button>
+
+    <button onClick={() => setDarkMode(!darkMode)}>
+      {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+    </button>
+  </div>
+)}
+      <div style={{ height:"80px" }} />
 
       {/* Nav dropdown */}
-      <div style={{ maxHeight:activeNav?"720px":"0", overflow:"hidden", transition:"max-height 0.4s ease", background:darkMode?"#111827":"#f8fafc", borderBottom:activeNav?`1px solid ${cardBdr}`:"none" }}>
-        {activeNav && NAV_CONTENT[activeNav] && (
-          <div style={{ padding:"20px 40px", maxWidth:"800px", margin:"0 auto" }}>
-            <p style={{ margin:"0 0 4px", fontWeight:700, fontSize:"15px", color:textMain }}>{NAV_CONTENT[activeNav].title}</p>
-            <p style={{ margin:0, fontSize:"14px", color:textMuted, lineHeight:"1.6" }}>{NAV_CONTENT[activeNav].body}</p>
-          </div>
-        )}
-      </div>
+      {activeNav && (
+        <div
+        ref={navContentRef}
+          style={{
+            padding: "30px",
+            background: darkMode ? "#0f172a" : "#f8fafc",
+            borderBottom: `1px solid ${cardBdr}`,
+            animation: "fadeSlideIn .4s ease"
+          }}
+  >
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "800px",
+        margin: "0 auto",
+        background: darkMode
+          ? "rgba(30,41,59,.8)"
+          : "rgba(255,255,255,.8)",
+        backdropFilter: "blur(20px)",
+        border: `1px solid ${cardBdr}`,
+        borderRadius: "24px",
+        padding: "30px",
+        boxShadow: darkMode
+          ? "0 10px 40px rgba(0,0,0,.4)"
+          : "0 10px 40px rgba(0,0,0,.08)"
+      }}
+    >
+{activeNav === "home" && (
+  <>
+    <div style={{fontSize:"42px"}}>
+      {NAV_CONTENT.home.icon}
+    </div>
 
+    <h2 style={{
+      margin:"10px 0",
+      fontSize:"32px",
+      fontWeight:"800"
+    }}>
+      {NAV_CONTENT.home.title}
+    </h2>
+
+    <p style={{
+      color:"#3b82f6",
+      fontWeight:"600"
+    }}>
+      {NAV_CONTENT.home.subtitle}
+    </p>
+
+    <p
+      style={{
+        whiteSpace: "pre-line",
+        lineHeight: "1.2",
+        maxWidth: "750px",
+        color: textMuted,
+        fontSize: "18px"
+      }}
+    >
+      {NAV_CONTENT.home.description}
+    </p>
+
+    <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+    gap: "20px",
+    marginTop: "30px",
+    marginBottom: "35px"
+  }}
+>
+  {NAV_CONTENT.home.stats.map((item) => (
+    <div
+      key={item.label}
+      style={{
+        padding: "20px",
+        borderRadius: "16px",
+        background: "rgba(59,130,246,.08)",
+        border: "1px solid rgba(59,130,246,.15)",
+        textAlign: "center"
+      }}
+    >
+      <h2
+        style={{
+          margin: 0,
+          color: "#3b82f6",
+          fontWeight: "800"
+        }}
+      >
+        {item.value}
+      </h2>
+
+      <p
+        style={{
+          marginTop: "8px",
+          color: "#64748b"
+        }}
+      >
+        {item.label}
+      </p>
+    </div>
+  ))}
+</div>
+
+  </>
+)}
+{activeNav === "about" && (
+  <>
+    <div style={{fontSize:"42px"}}>
+      {NAV_CONTENT.about.icon}
+    </div>
+
+    <h2 style={{
+      margin:"10px 0",
+      fontSize:"32px",
+      fontWeight:"800"
+    }}>
+      {NAV_CONTENT.about.title}
+    </h2>
+
+    <p style={{
+      color:"#3b82f6",
+      fontWeight:"600"
+    }}>
+      {NAV_CONTENT.about.subtitle}
+    </p>
+
+    <p style={{
+      color:textMuted,
+      lineHeight:"1.8"
+    }}>
+      {NAV_CONTENT.about.description}
+    </p>
+
+    <div
+      style={{
+        display:"grid",
+        gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",
+        gap:"15px",
+        marginTop:"25px"
+      }}
+    >
+      {NAV_CONTENT.about.features.map(item=>(
+        <div
+          key={item}
+          style={{
+            padding:"16px",
+            borderRadius:"14px",
+            background:darkMode ? "#1e293b" : "#ffffff",
+            border:`1px solid ${cardBdr}`,
+            fontWeight:"600"
+          }}
+        >
+          ✓ {item}
+        </div>
+      ))}
+    </div>
+
+   
+<div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    borderRadius: "16px",
+    background: "rgba(16,185,129,.08)",
+    border: "1px solid rgba(16,185,129,.15)"
+  }}
+>
+  <strong>🎯 Mission:</strong> To make precision medicine accessible by
+  leveraging AI and pharmacogenomics for safer, smarter, and more
+  personalized healthcare decisions.
+</div>
+  </>
+)}
+
+{activeNav === "contact" && (
+  <>
+    <div style={{fontSize:"42px"}}>
+      {NAV_CONTENT.contact.icon}
+    </div>
+
+    <h2 style={{
+      margin:"10px 0",
+      fontSize:"32px",
+      fontWeight:"800"
+    }}>
+      {NAV_CONTENT.contact.title}
+    </h2>
+
+    <p style={{
+      color:"#3b82f6",
+      fontWeight:"600"
+    }}>
+      {NAV_CONTENT.contact.subtitle}
+    </p>
+
+    <div
+      style={{
+        display:"grid",
+        gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",
+        gap:"30px",
+        marginTop:"40px"
+        
+      }}
+    >
+      <div className="contact-card" >
+        📧
+        <a
+          href="https://mail.google.com/mail/?view=cm&fs=1&to=chandan2004.n@gmail.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color:"inherit",
+            textDecoration:"none",
+            marginLeft:"8px",
+            fontWeight:"600"
+          }}
+        >
+          {NAV_CONTENT.contact.email}
+        </a>
+      </div>
+      <div className="contact-card">📞 {NAV_CONTENT.contact.phone}</div>
+      <div className="contact-card">📍 {NAV_CONTENT.contact.location}</div>
+      <div className="contact-card">🌐 {NAV_CONTENT.contact.website}</div>
+    </div>
+  </>
+)}
+    </div>
+  </div>
+)}
       {/* HERO section */}
+      <div style={CONTAINER}>
       <div style={{ textAlign:"center", padding:"64px 20px 40px", position:"relative" }}>
         <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"600px", height:"300px", background:darkMode?"radial-gradient(ellipse,rgba(59,130,246,0.15) 0%,transparent 70%)":"radial-gradient(ellipse,rgba(59,130,246,0.10) 0%,transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ display:"inline-flex", alignItems:"center", gap:"8px", background:darkMode?"#1e2530":"#eff6ff", border:`1px solid ${darkMode?"#2e3a4e":"#bfdbfe"}`, borderRadius:"99px", padding:"6px 16px", marginBottom:"20px" }}>
@@ -739,8 +1130,10 @@ const NAV_CONTENT = {
           AI-powered pharmacogenomic risk prediction for precision medicine and safer prescriptions.
         </p>
       </div>
+      </div>
 
       {/* MAIN CARD section*/}
+    <div style={CONTAINER}>
       <div style={{ display:"flex", justifyContent:"center", padding:"0 20px 60px" }}>
         <div style={{ width:"100%", maxWidth:"660px", background:cardBg, border:`1px solid ${cardBdr}`, borderRadius:"24px", padding:"36px", boxShadow:darkMode?"0 8px 40px rgba(0,0,0,0.5)":"0 8px 40px rgba(0,0,0,0.10)" }}>
 
@@ -870,44 +1263,300 @@ const NAV_CONTENT = {
           )}
         </div>
       </div>
+</div>
 
       {/* FEATURES  */}
-      <div style={{ background:darkMode?"#111827":"#ffffff", padding:"72px 20px", textAlign:"center" }}>
-        <p style={{ margin:"0 0 8px", fontSize:"11px", fontWeight:700, color:"#3b82f6", letterSpacing:"0.1em", textTransform:"uppercase" }}>Why Choose Us</p>
+    <div style={CONTAINER}>
+      <div style={{ background:darkMode?"#111827":"#ffffff", padding:"72px 20px", textAlign:"center", borderRadius:"24px", boxShadow:darkMode?"0 8px 40px rgba(0,0,0,0.5)":"0 8px 40px rgba(0,0,0,0.10)" }}>
+        <p style={{ margin:"0 0 8px", fontSize:"18px", fontWeight:700, color:"#3b82f6", letterSpacing:"0.1em", textTransform:"uppercase" }}>Why Choose Us</p>
         <h2 style={{ fontSize:"clamp(28px,4vw,40px)", fontWeight:800, letterSpacing:"-0.02em", margin:"0 0 48px" }}>Why Pharma Guard?</h2>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:"24px", maxWidth:"1000px", margin:"0 auto" }}>
+        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:"34px", maxWidth:"1000px", margin:"0 auto" }}>
           {[
             { emoji:"🤖", title:"AI Prediction",      color:"#3b82f6", text:"Advanced models analyse genomic variants to predict drug response risks, helping clinicians avoid adverse reactions before treatment begins." },
             { emoji:"🧬", title:"Precision Medicine",  color:"#10b981", text:"Tailors medication recommendations based on individual genetic profiles, enabling safer, more effective personalised healthcare decisions." },
             { emoji:"📊", title:"Clinical Insights",   color:"#f59e0b", text:"Actionable pharmacogenomic insights support clinical decision-making with clear risk assessment, dosage guidance, and evidence-based recommendations." },
           ].map(item=>(
             <div key={item.title} style={{
-              width:"280px", padding:"28px",
-              background:cardBg, border:`1px solid ${cardBdr}`,
-              borderRadius:"20px", textAlign:"left",
+              width:"100%",maxWidth:"320px", padding:"28px",
+              background:cardBg, border:`2px solid ${cardBdr}`,
+              borderRadius:"20px", textAlign:"center",
               boxShadow:darkMode?"0 4px 20px rgba(0,0,0,0.3)":"0 4px 20px rgba(0,0,0,0.06)",
               transition:"transform 0.3s, box-shadow 0.3s", cursor:"default",
             }}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-6px)";e.currentTarget.style.boxShadow=darkMode?"0 12px 32px rgba(0,0,0,0.5)":"0 12px 32px rgba(0,0,0,0.12)";}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-25px)";e.currentTarget.style.boxShadow=darkMode?"0 12px 32px rgba(0,0,0,0.5)":"0 12px 32px rgba(0,0,0,0.12)";}}
               onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=darkMode?"0 4px 20px rgba(0,0,0,0.3)":"0 4px 20px rgba(0,0,0,0.06)";}}
             >
-              <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:`${item.color}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"22px", marginBottom:"14px" }}>{item.emoji}</div>
+              <div style={{ width:"60px", height:"54px", borderRadius:"12px", background:`${item.color}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"40px", marginBottom:"14px" }}>{item.emoji}</div>
               <h3 style={{ margin:"0 0 8px", fontSize:"16px", fontWeight:700, color:item.color }}>{item.title}</h3>
-              <p style={{ margin:0, fontSize:"13px", lineHeight:"1.7", color:textMuted }}>{item.text}</p>
+              <p style={{ margin:0, fontSize:"15px", lineHeight:"1.7", color:textMuted }}>{item.text}</p>
             </div>
           ))}
         </div>
       </div>
+</div>
 
-      {/* FOOTER */}
-      <div style={{ background:darkMode?"#0d1117":"#f8fafc", borderTop:`1px solid ${cardBdr}`, padding:"20px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:"12px" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-          <span style={{ fontSize:"18px" }}>🧬</span>
-          <span style={{ fontSize:"13px", fontWeight:600, color:textMuted }}>Pharma Guard</span>
+{/* FOOTER */}
+<footer
+  style={{
+    background: darkMode
+      ? "linear-gradient(135deg,#0f172a,#111827,#1e293b)"
+      : "linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb)",
+    color: "#fff",
+    padding: "70px 40px 30px",
+    marginTop: "80px",
+    position: "relative",
+    overflow: "hidden"
+  }}
+>
+  {/* Glow Effect */}
+  <div
+    style={{
+      position: "absolute",
+      top: "-100px",
+      right: "-100px",
+      width: "300px",
+      height: "300px",
+      borderRadius: "50%",
+      background: "rgba(59,130,246,.15)",
+      filter: "blur(80px)"
+    }}
+  />
+
+  <div
+    className="footer-container"
+    style={{
+      maxWidth: "1400px",
+      margin: "0 auto",
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+      gap: "50px"
+    }}
+  >
+    {/* Brand */}
+    <div>
+      <div
+        className="footer-brand"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "18px"
+        }}
+      >
+        <span style={{ fontSize: "34px" }}>🧬</span>
+
+        <div className="footer-brand">
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "28px",
+              fontWeight: "800"
+            }}
+          >
+            PharmaGuard
+          </h2>
+
+          <p
+            style={{
+              margin: 0,
+              color: "#93c5fd",
+              fontSize: "13px"
+            }}
+          >
+            AI-Powered Precision Medicine
+          </p>
         </div>
-        <span style={{ fontSize:"12px", color:textMuted }}>Built for RIFT 2026 Hackathon · AI Hunters Team</span>
       </div>
 
+      <p
+        style={{
+          lineHeight: "1.9",
+          color: "#cbd5e1",
+          maxWidth: "450px"
+        }}
+      >
+        PharmaGuard combines Artificial Intelligence,
+        Pharmacogenomics, and Clinical Decision Support
+        to help healthcare professionals prescribe safer
+        and more personalized medications.
+      </p>
+
+      <div
+          className="footer-social"
+        style={{
+          display: "flex",
+          gap: "12px",
+          marginTop: "25px"
+        }}
+      >
+        {["🔗", "💻", "📧", "🚀"].map((icon, index) => (
+          <div
+            key={index}
+            style={{
+              width: "45px",
+              height: "45px",
+              borderRadius: "12px",
+              background: "rgba(255,255,255,.08)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: "pointer",
+              transition: ".3s"
+            }}
+          >
+            {icon}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Product */}
+    <div>
+      <h3 style={{ marginBottom: "20px" }}>
+        Product
+      </h3>
+
+      {[
+        "Risk Prediction",
+        "Genomic Analysis",
+        "Clinical Reports",
+        "Drug Interaction"
+      ].map(item => (
+        <p key={item}
+          style={{
+            color: "#cbd5e1",
+            cursor: "pointer"
+          }}
+        >
+          {item}
+        </p>
+      ))}
+    </div>
+
+    {/* Resources */}
+    <div>
+      <h3 style={{ marginBottom: "20px" }}>
+        Resources
+      </h3>
+
+      {[
+        "Documentation",
+        "Research Papers",
+        "Dataset",
+        "API Access"
+      ].map(item => (
+        <p key={item}
+          style={{
+            color: "#cbd5e1",
+            cursor: "pointer"
+          }}
+        >
+          {item}
+        </p>
+      ))}
+    </div>
+
+    {/* Contact */}
+    <div>
+      <h3 style={{ marginBottom: "20px" }}>
+        Contact
+      </h3>
+
+        <p style={{ color:"#cbd5e1" }}>
+          📧
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=chandan2004.n@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color:"#cbd5e1",
+              textDecoration:"none",
+              marginLeft:"6px"
+            }}
+          >
+          pharmaguard.ai@gmail.com
+        </a>
+        </p>
+
+      <p style={{ color: "#cbd5e1" }}>
+        📞 +91 63604 75219
+      </p>
+
+      <p style={{ color: "#cbd5e1" }}>
+        📍 Bengaluru, Karnataka
+      </p>
+
+      <p style={{ color: "#cbd5e1" }}>
+        🌐 www.pharmaguard.ai
+      </p>
+    </div>
+  </div>
+
+  {/* Stats Section */}
+  <div
+    className="footer-stats"
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      gap: "80px",
+      flexWrap: "wrap",
+      marginTop: "60px",
+      paddingTop: "40px",
+      borderTop: "1px solid rgba(255,255,255,.1)"
+    }}
+  >
+    {[
+      ["95%", "Prediction Accuracy"],
+      ["50K+", "Genomic Variants"],
+      ["24/7", "Clinical Support"],
+      ["AI", "Powered Insights"]
+    ].map(([value, label]) => (
+      <div key={label} style={{ textAlign: "center" }}>
+        <h2
+          style={{
+            margin: 0,
+            color: "#60a5fa",
+            fontSize: "32px"
+          }}
+        >
+          {value}
+        </h2>
+
+        <p
+          style={{
+            marginTop: "8px",
+            color: "#cbd5e1"
+          }}
+        >
+          {label}
+        </p>
+      </div>
+    ))}
+  </div>
+
+  {/* Bottom */}
+  <div
+    className="footer-bottom"
+    style={{
+      marginTop: "40px",
+      paddingTop: "20px",
+      borderTop: "1px solid rgba(255,255,255,.1)",
+      display: "flex",
+      justifyContent: "space-between",
+      flexWrap: "wrap",
+      color: "#94a3b8",
+      fontSize: "14px"
+    }}
+  >
+    <span>
+      © 2026 PharmaGuard. All Rights Reserved.
+    </span>
+
+    <span>
+      Built for RIFT 2026 Hackathon • AI Hunters Team
+    </span>
+  </div>
+</footer>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
@@ -917,6 +1566,152 @@ const NAV_CONTENT = {
         @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
         @keyframes fadeSlideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
         @keyframes badgePop{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+
+        @media (max-width: 992px){
+
+          .footer-brand{
+              text-align:center;
+          }
+
+          .footer-social{
+              justify-content:center !important;
+          }
+
+        }
+
+        @media (max-width: 768px){
+
+          .footer-container{
+              grid-template-columns:1fr !important;
+              text-align:center;
+          }
+
+          .footer-social{
+              justify-content:center !important;
+          }
+
+          .footer-bottom{
+              flex-direction:column;
+              text-align:center;
+              gap:10px;
+          }
+
+          .footer-stats{
+              grid-template-columns:1fr 1fr !important;
+          }
+
+        }
+
+        @media (max-width: 480px){
+
+          .footer-stats{
+              grid-template-columns:1fr !important;
+          }
+
+          .footer-title{
+              font-size:32px !important;
+          }
+
+        }
+
+
+    /* NAVBAR RESPONSIVE */
+
+        @media (max-width:768px){
+
+          .navbar-container{
+            flex-direction:column;
+            padding:15px !important;
+          }
+
+          .logo-section{
+            justify-content:center;
+          }
+
+          .nav-menu{
+            justify-content:center;
+            width:100%;
+            gap:8px;
+          }
+
+          .nav-menu button{
+            font-size:13px !important;
+            padding:8px 12px !important;
+          }
+
+        }
+
+        @media (max-width:480px){
+
+          .nav-menu{
+            display:grid !important;
+            grid-template-columns:repeat(2,1fr);
+            width:100%;
+          }
+
+          .nav-menu button{
+            width:100%;
+          }
+
+        }
+
+
+.mobile-menu-btn{
+  display:none;
+}
+
+.mobile-dropdown{
+  display:none;
+}
+
+@media (max-width:768px){
+
+  .navbar-container{
+    flex-direction:row !important;
+    justify-content:space-between !important;
+    align-items:center !important;
+    padding:12px 16px !important;
+  }
+
+  .desktop-menu{
+    display:none !important;
+  }
+
+  .mobile-menu-btn{
+    display:block !important;
+  }
+
+  .logo-section{
+    flex:1;
+  }
+
+  .mobile-dropdown{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    position:fixed;
+    top:72px;
+    left:0;
+    width:100%;
+    z-index:999;
+    background:inherit;
+    padding:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+  }
+
+  .mobile-dropdown button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:600;
+    text-align:left;
+    background:#f1f5f9;
+    cursor:pointer;
+  }
+}
+
       `}</style>
     </div>
   );
