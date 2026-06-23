@@ -661,9 +661,8 @@ const NAV_CONTENT = {
       We'd love to hear from you.
 
       📧 Email: pharmaguard@rift2026.ai
-      🌐 Website: www.pharmaguard.ai
       📍 Location: Bengaluru, Karnataka, India
-      📞 Phone: +91 98765 43210
+      📞 Phone: +91 6360475219
 
       Team AI Hunters
       RIFT 2026 Hackathon Project
