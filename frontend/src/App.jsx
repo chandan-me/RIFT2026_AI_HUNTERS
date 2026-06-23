@@ -719,7 +719,7 @@ const NAV_CONTENT = {
       </nav>
 
       {/* Nav dropdown */}
-      <div style={{ maxHeight:activeNav?"auto":"0", overflow:"hidden", transition:"max-height 0.4s ease", background:darkMode?"#111827":"#f8fafc", borderBottom:activeNav?`1px solid ${cardBdr}`:"none" }}>
+      <div style={{ maxHeight:activeNav?"720px":"0", overflow:"hidden", transition:"max-height 0.4s ease", background:darkMode?"#111827":"#f8fafc", borderBottom:activeNav?`1px solid ${cardBdr}`:"none" }}>
         {activeNav && NAV_CONTENT[activeNav] && (
           <div style={{ padding:"20px 40px", maxWidth:"800px", margin:"0 auto" }}>
             <p style={{ margin:"0 0 4px", fontWeight:700, fontSize:"15px", color:textMain }}>{NAV_CONTENT[activeNav].title}</p>
